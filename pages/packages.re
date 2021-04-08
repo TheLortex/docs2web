@@ -6,26 +6,29 @@ let item = ((name, (version, info))) => {
   let name = OpamPackage.Name.to_string(name);
   let version = OpamPackage.Version.to_string(version);
   let uri = name ++ "/" ++ version ;
-  <div style="display: flex" >
-    <div style="flex: 1"><a href=uri>{name |> Html.txt}</a></div>
-    <div style="flex: 1">{version |> Html.txt}</div>
-    <div style="flex: 1">{info.Docs2web.Package.Info.synopsis |> Html.txt}</div>
-  </div>
+  <tr>
+    <td><a href=uri>{name |> Html.txt}</a></td>
+    <td>{version |> Html.txt}</td>
+    <td>{info.Docs2web.Package.Info.synopsis |> Html.txt}</td>
+  </tr>
 }
 
 let render = (packages) => {
   let content = List.map(item, packages);
-  <html>
-    <head>
-      <title>"OCaml docs - Packages"</title>
-    </head>
-    <body>
-      <a href="/">"Home"</a>
-      <div>
+  <Template title=" - Packages">
+    <table class_="list-packages">
+      <thead>
+        <tr>
+            <th style="width: 25%;">"Name"</th>
+            <th>"Latest version"</th>
+            <th>"Description"</th>
+        </tr>
+      </thead>
+      <tbody>
         ...content
-      </div>
-    </body>
-  </html>
+      </tbody>
+    </table>
+  </Template>
 }
 
 let v = (~state: State.t) => {

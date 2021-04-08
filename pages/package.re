@@ -12,40 +12,55 @@ module Documentation = {
   }
 }
 
-let version_link(name,version) = {
+let header = (name, version, info, all_versions) => {
+  let package_name = OpamPackage.Name.to_string (name);
+  let package_version = OpamPackage.Version.to_string (version);
+  let all_versions_links = OpamPackage.Version.Map.keys(all_versions) 
+    |> List.map(OpamPackage.Version.to_string)
+    |> List.rev_map((version) => <li><a href= {"/packages/" ++ package_name ++ "/" ++ version}>{version |> Html.txt}</a></li>)
+  ;
+  let home_package_link =   "/packages/" ++ package_name ++ "/" ++ package_version;
+  [
+    <span>{package_name |> Html.txt}</span>,
+    <div>
+    <a href=home_package_link> {package_version |> Html.txt} </a>
+    <ul>
+      ...all_versions_links
+    </ul>
+    </div>
+  
+  ]
+}
+
+let version_link(name, version) = {
   let version = OpamPackage.Version.to_string(version);
   let link = "/packages/"++name++"/"++version;
   <span><a href=link>{version |> Html.txt}</a> "/" </span>
 }
+
 let render = (~name, ~version, ~info, ~docs, ~all_versions) => {
   ignore(info);
-
+  let header = header(name, version, info, all_versions);
   let name = OpamPackage.Name.to_string(name);
   let version = OpamPackage.Version.to_string(version);
-  let all_versions = List.map(version_link(name), OpamPackage.Version.Map.keys(all_versions));
-  <html>
-    <head>
-      <title>{Html.txt("OCaml docs - " ++ name ++ "." ++ version)}</title>
-    </head>
-    <body>
-      <div>
-        ...all_versions
-      </div>
-      <br/>
-      <div>
-        <Documentation docs=docs />
-      </div>
-    </body>
-  </html>
+  let title = " - " ++ name ++ "." ++ version;
+  <Template header title>
+    <br/>
+    <div>
+      <Documentation docs=docs />
+    </div>
+  </Template>
+}
+
+let prefix (kind) = switch(kind) {
+  | Blessed => "/packages"
+  | Universe(u) => "/universes/" ++ u
 }
 
 let v = (~state, ~kind, ~package, ~version=?, ~path, ()) =>
 {
-  ignore(path);
-  Dream.log ("=> %s/%s", package, Option.value(~default="<latest>", version));
   let name = OpamPackage.Name.of_string (package);
-  let* docs = Docs2web.Documentation.load(path);
-  let+ versions = Docs2web.State.get_package(state, name);
+  let* versions = Docs2web.State.get_package(state, name);
   
   let info = switch (version) {
     | None => snd(OpamPackage.Version.Map.max_binding(versions))
@@ -56,6 +71,8 @@ let v = (~state, ~kind, ~package, ~version=?, ~path, ()) =>
     | None => fst(OpamPackage.Version.Map.max_binding(versions)) |> OpamPackage.Version.to_string
     | Some(v) => v
   };
+
+  let+ docs = Docs2web.Documentation.load(prefix(kind)++"/"++OpamPackage.Name.to_string(name)++"/"++version_str++"/"++path);
 
   let version =
   switch (kind) {

@@ -1,0 +1,95 @@
+
+@import url('https://fonts.googleapis.com/css?family=Fira+Mono:400,500');
+@import url('https://fonts.googleapis.com/css?family=Noticia+Text:400,400i,700');
+@import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,400i,500,500i,600,600i,700,700i');
+
+
+body {
+    background-color: white;
+    margin: 0;
+    font-family: "Noticia Text", Georgia, serif;
+}
+
+a {
+    color: #b40404;
+    text-decoration: none;
+}
+
+.list-packages tr:nth-child(odd) {
+    background-color: #f8f8f8;
+}
+
+.list-packages td {
+    padding: 5px;
+}
+
+header {
+    font-variant: small-caps;
+    border-bottom: solid gray 1px;
+}
+
+header nav {
+    max-width: 140ex;
+    margin: auto;
+    border-left: solid #ccc 1px;
+}
+
+header nav li:hover {
+    background-color: #ebe7e1;
+}
+
+body > section {
+    max-width: 140ex;
+    margin: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+
+header nav ul {
+	padding: 0;
+    margin: 0;
+	list-style: none;
+	position: relative;
+}
+
+header nav ul li {
+    display: inline-block;
+    border-right: solid #ccc 1px;
+}
+
+header li a,span {
+    padding: 10px 30px;
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+}
+
+header nav ul ul {
+    display: none;
+    position: absolute; 
+    top: 10px;
+}
+
+header nav ul li:hover > div > ul {
+    display:inherit;
+}
+
+header nav ul ul {
+    max-height: 40vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: solid gray 1px;
+    box-shadow: 0 0 3px black;
+}
+
+header nav ul ul li {
+	width:170px;
+	float:none;
+	display:list-item;
+	position: relative;
+    background-color: white;
+}
+
+header li > div > a:after { content:  '  +'; }
+header li > div > a:only-child:after { content: ''; }

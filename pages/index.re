@@ -1,11 +1,8 @@
 open Tyxml;
-let render = <html>
-    <head>
-      <title>"OCaml docs"</title>
-    </head>
-    <body>
-      <a href="/packages/">"Packages"</a>
-    </body>
-  </html>
+
+let render = 
+  <Template title="">
+    "index page"
+  </Template>
 
 let v = Lwt.return(Fmt.to_to_string(Html.pp(), render))

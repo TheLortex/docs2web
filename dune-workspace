@@ -1,0 +1,5 @@
+(lang dune 2.0)
+
+(env
+  (dev
+    (flags (:standard -w -66-27))))
