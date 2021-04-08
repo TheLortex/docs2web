@@ -1,4 +1,4 @@
 (executable
  (name docs2web)
  (public_name docs2web)
- (libraries docs2web))
+ (libraries docs2web docs2web_pages))

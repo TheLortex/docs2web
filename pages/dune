@@ -1,0 +1,5 @@
+(library
+ (name docs2web_pages)
+ (libraries dream tyxml docs2web)
+ (preprocess (pps tyxml-jsx))
+)
