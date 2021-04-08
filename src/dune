@@ -1,0 +1,5 @@
+(library
+ (name docs2web)
+ (public_name docs2web)
+ (libraries dream)
+)
