@@ -8,7 +8,9 @@ depends: [
   "dune"
   "dream"
   "git-unix"
-  "tyxml-ppx"
+  "tyxml-jsx"
+  "lambdasoup"
+  "reason"
 ]
 build: [
 #  ["dune" "subst"] {pinned}
