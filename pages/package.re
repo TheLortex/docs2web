@@ -1,35 +1,52 @@
 open Tyxml;
 open Lwt.Syntax;
+open Docs2web;
 
 type kind =
   | Blessed
   | Universe(string);
 
 
-module Documentation = {
-  let createElement = (~docs, ()) => {
-    <div>"Documentation:" docs</div>
-  }
-}
-
-let header = (name, version, info, all_versions) => {
+let header = (state, name, version, info, all_versions, path) => {
+  let package = OpamPackage.create(name, version);
   let package_name = OpamPackage.Name.to_string (name);
   let package_version = OpamPackage.Version.to_string (version);
   let all_versions_links = OpamPackage.Version.Map.keys(all_versions) 
-    |> List.map(OpamPackage.Version.to_string)
-    |> List.rev_map((version) => <li><a href= {"/packages/" ++ package_name ++ "/" ++ version}>{version |> Html.txt}</a></li>)
+    |> List.rev_map((version) => {
+    let package = OpamPackage.create(name, version);
+    let version_str = OpamPackage.Version.to_string(version); 
+    <li>
+      <a href= {"/packages/" ++ package_name ++ "/" ++ version_str} style="display: flex; justify-content: space-between">
+        {version_str |> Html.txt}
+        {Docs.badge(state, package)}
+      </a>
+    </li>})
   ;
+  let docs = State.docs(state);
+  let docs_info = Documentation.package_info(docs, package);
+
+  let permalink = 
+    switch(docs_info) {
+      | Some (pkg) =>
+        switch(Documentation.Package.status(pkg)) {
+          | Built(universe) => [
+            <div class_="permalink">
+              <a href={"/universes/"++universe++"/"++package_name++"/"++package_version++path}>"#permalink"</a>
+            </div>]
+          | _ => []
+        }
+      | None => []
+    };
+
   let home_package_link =   "/packages/" ++ package_name ++ "/" ++ package_version;
-  [
-    <span>{package_name |> Html.txt}</span>,
-    <div>
-    <a href=home_package_link> {package_version |> Html.txt} </a>
-    <ul>
-      ...all_versions_links
-    </ul>
-    </div>
-  
-  ]
+  [<a href=home_package_link>{package_name |> Html.txt}</a>,
+  <div>
+  <a href=home_package_link> {package_version |> Html.txt} </a>
+  <ul>
+    ...all_versions_links
+  </ul>
+  </div>
+   ] @ permalink
 }
 
 let version_link(name, version) = {
@@ -38,18 +55,26 @@ let version_link(name, version) = {
   <span><a href=link>{version |> Html.txt}</a> "/" </span>
 }
 
-let render = (~name, ~version, ~info, ~docs, ~all_versions) => {
+let render = (~state, ~name, ~version, ~info, ~docs=?, ~all_versions, ~path) => {
   ignore(info);
-  let header = header(name, version, info, all_versions);
+  let header = header(state, name, version, info, all_versions, path);
   let name = OpamPackage.Name.to_string(name);
   let version = OpamPackage.Version.to_string(version);
   let title = " - " ++ name ++ "." ++ version;
-  <Template header title>
-    <br/>
-    <div>
-      <Documentation docs=docs />
-    </div>
-  </Template>
+
+  switch(docs) {
+    | None => 
+      <Template header title>
+        <br/>
+        <div>"No documentation"</div>
+      </Template>
+    | Some(docs) => 
+      <Template header title>
+        <br/>
+        docs
+      </Template>
+  }
+  
 }
 
 let prefix (kind) = switch(kind) {
@@ -57,28 +82,14 @@ let prefix (kind) = switch(kind) {
   | Universe(u) => "/universes/" ++ u
 }
 
-let v = (~state, ~kind, ~package, ~version=?, ~path, ()) =>
+let v = (~state, ~kind, ~name, ~version, ~path, ()) =>
 {
-  let name = OpamPackage.Name.of_string (package);
-  let* versions = Docs2web.State.get_package(state, name);
-  
-  let info = switch (version) {
-    | None => snd(OpamPackage.Version.Map.max_binding(versions))
-    | Some(v) => OpamPackage.Version.Map.find(OpamPackage.Version.of_string(v),versions)
-  };
+  let* versions = Docs2web.State.get_package(state, name);   
+  let info =  OpamPackage.Version.Map.find(version,versions);
 
-  let version_str = switch (version) {
-    | None => fst(OpamPackage.Version.Map.max_binding(versions)) |> OpamPackage.Version.to_string
-    | Some(v) => v
-  };
+  let+ docs = 
+    Docs2web.Documentation.load(prefix(kind)++"/"++OpamPackage.Name.to_string(name)++"/"++OpamPackage.Version.to_string(version)++"/"++path) ;
+  let docs = Result.to_option(docs);
 
-  let+ docs = Docs2web.Documentation.load(prefix(kind)++"/"++OpamPackage.Name.to_string(name)++"/"++version_str++"/"++path);
-
-  let version =
-  switch (kind) {
-    | Blessed => version_str
-    | Universe(u) => version_str ++ "@" ++ u 
-  } |> OpamPackage.Version.of_string;
-  
-  Fmt.to_to_string(Html.pp(), render(~name,~version, ~info, ~docs, ~all_versions=versions))
+  Fmt.to_to_string(Html.pp(), render(~state, ~name,~version, ~info, ~docs=?docs, ~all_versions=versions, ~path))
 }

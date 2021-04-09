@@ -8,5 +8,7 @@ val all_packages_latest :
 val get_package :
   t -> OpamPackage.Name.t -> Package.Info.t OpamPackage.Version.Map.t Lwt.t
 
-val get_documentation_status :
-  t -> package:OpamPackage.t -> universe:string -> Documentation.Status.t Lwt.t
+val get_package_opt :
+  t -> OpamPackage.Name.t -> Package.Info.t OpamPackage.Version.Map.t option Lwt.t
+
+val docs : t -> Documentation.t
