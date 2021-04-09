@@ -1,5 +1,5 @@
 (library
  (name docs2web)
  (public_name docs2web)
- (libraries git-unix opam-format tyxml lambdasoup yojson cohttp-lwt-unix dream)
-)
+ (libraries git-unix opam-format tyxml lambdasoup yojson cohttp-lwt-unix
+   dream))

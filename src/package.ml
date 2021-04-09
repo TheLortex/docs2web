@@ -29,4 +29,4 @@ type t = {
 
 let of_opamfile (opam : OpamFile.OPAM.t) =
   let open OpamFile.OPAM in
-  { name = name opam; version = version opam; info = Info.of_opamfile opam}
+  { name = name opam; version = version opam; info = Info.of_opamfile opam }

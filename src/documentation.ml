@@ -116,6 +116,7 @@ let load path =
       let* load = try_load (path ^ "/index.html") in
       match load with
       | Ok v -> Lwt.return_ok v
-      | Error _ -> try_load (Astring.String.trim ~drop:( (=) '/') path ^ ".html")
+      | Error _ ->
+          try_load (Astring.String.trim ~drop:(( = ) '/') path ^ ".html")
   in
   res ()

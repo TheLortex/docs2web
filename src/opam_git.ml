@@ -10,11 +10,15 @@ let read_dir store hash =
 
 let read_package store pkg hash =
   Search.find store hash (`Path [ "opam" ]) >>= function
-  | None -> Fmt.failwith "opam file not found for %s" (OpamPackage.to_string pkg)
+  | None ->
+      Fmt.failwith "opam file not found for %s" (OpamPackage.to_string pkg)
   | Some hash -> (
       Store.read store hash >|= function
-      | Ok (Git.Value.Blob blob) -> OpamFile.OPAM.read_from_string (Store.Value.Blob.to_string blob)
-      | _ -> Fmt.failwith "Bad Git object type for %s!" (OpamPackage.to_string pkg) )
+      | Ok (Git.Value.Blob blob) ->
+          OpamFile.OPAM.read_from_string (Store.Value.Blob.to_string blob)
+      | _ ->
+          Fmt.failwith "Bad Git object type for %s!" (OpamPackage.to_string pkg)
+      )
 
 (* Get a map of the versions inside [entry] (an entry under "packages") *)
 let read_versions store (entry : Store.Value.Tree.entry) =
@@ -29,7 +33,8 @@ let read_versions store (entry : Store.Value.Tree.entry) =
                  read_package store pkg entry.node >|= fun opam ->
                  OpamPackage.Version.Map.add pkg.version opam acc
              | None ->
-                 OpamConsole.log "opam-0install" "Invalid package name %S" entry.name;
+                 OpamConsole.log "opam-0install" "Invalid package name %S"
+                   entry.name;
                  Lwt.return acc)
            OpamPackage.Version.Map.empty
       >|= fun versions -> Some versions
@@ -46,11 +51,13 @@ let read_packages store commit =
                (fun acc (entry : Store.Value.Tree.entry) ->
                  match OpamPackage.Name.of_string entry.name with
                  | exception ex ->
-                     OpamConsole.log "opam-0install" "Invalid package name %S: %s" entry.name
+                     OpamConsole.log "opam-0install"
+                       "Invalid package name %S: %s" entry.name
                        (Printexc.to_string ex);
                      Lwt.return acc
                  | name -> (
                      read_versions store entry >|= function
                      | None -> acc
-                     | Some versions -> OpamPackage.Name.Map.add name versions acc ))
+                     | Some versions ->
+                         OpamPackage.Name.Map.add name versions acc ))
                OpamPackage.Name.Map.empty )
