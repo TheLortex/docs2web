@@ -77,7 +77,7 @@ let packages_scope ~state kind =
 
 let job =
   let* state = Docs2web.State.v () in
-  Dream.serve @@ Dream.logger
+  Dream.serve ~prefix:Docs2web.Config.prefix @@ Dream.logger
   @@ Dream.router
        [
          Dream.get "/" (fun _ -> respond Docs2web_pages.Index.v);

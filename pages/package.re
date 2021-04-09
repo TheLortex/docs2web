@@ -17,7 +17,7 @@ let header = (state, name, version, info, all_versions, path) => {
          let version_str = OpamPackage.Version.to_string(version);
          <li>
            <a
-             href={"/packages/" ++ package_name ++ "/" ++ version_str}
+             href={Config.prefix ++ "packages/" ++ package_name ++ "/" ++ version_str}
              style="display: flex; justify-content: space-between">
              {version_str |> Html.txt}
              {Docs.badge(state, package)}
@@ -36,7 +36,8 @@ let header = (state, name, version, info, all_versions, path) => {
           <div class_="permalink">
             <a
               href={
-                "/universes/"
+                Docs2web.Config.prefix ++ 
+                "universes/"
                 ++ universe
                 ++ "/"
                 ++ package_name
@@ -67,7 +68,7 @@ let header = (state, name, version, info, all_versions, path) => {
 
 let version_link = (name, version) => {
   let version = OpamPackage.Version.to_string(version);
-  let link = "/packages/" ++ name ++ "/" ++ version;
+  let link = Docs2web.Config.prefix ++ "packages/" ++ name ++ "/" ++ version;
   <span> <a href=link> {version |> Html.txt} </a> "/" </span>;
 };
 
