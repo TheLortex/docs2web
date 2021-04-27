@@ -1,5 +1,5 @@
-let docs_server = "https://ci.mirage.io/staging/"
+let api = Uri.of_string "http://localhost:8081/graphql"
 
-let docs_file = "/home/lucas/mirage/ci/docs-ci/docs.json"
+let schema = "schema.json"
 
 let prefix = "/docs2web/"

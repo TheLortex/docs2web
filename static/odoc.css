@@ -4,28 +4,28 @@
    odoc 2.0.0-beta2-70-g50fcb86a */
 
 /* Fonts */
-@import url('https://fonts.googleapis.com/css?family=Fira+Mono:400,500');
-@import url('https://fonts.googleapis.com/css?family=Noticia+Text:400,400i,700');
-@import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,400i,500,500i,600,600i,700,700i');
-
 :root,
 .light:root {
-  --link-color: #2C94BD;
+  --link-color: rgb(159, 104, 0);
+  --link-color-hover: rgb(206, 134, 0);
   --anchor-hover: #555;
   --anchor-color: #d5d5d5;
   --xref-shadow: #cc6666;
   --header-shadow: #ddd;
   --by-name-version-color: #aaa;
   --by-name-nav-link-color: #222;
-  --target-background: rgba(187, 239, 253, 0.3);
-  --target-shadow: rgba(187, 239, 253, 0.8);
+  --target-background: rgba(253, 238, 187, 0.3);
+  --target-shadow: rgba(253, 235, 187, 0.8);
   --pre-border-color: #eee;
   --code-background: #f6f8fa;
-  --spec-summary-border-color: #5c9cf5;
+  --spec-summary-border-color: rgb(136, 136, 136);
   --spec-summary-background: var(--code-background);
   --spec-summary-hover-background: #ebeff2;
   --spec-details-after-background: rgba(0, 4, 15, 0.05);
   --spec-details-after-shadow: rgba(204, 204, 204, 0.53);
+  --toc-before-color: #666;
+  --toc-list-border: #333;
+  --toc-background: white;
 }
 
 .dark:root {
@@ -57,53 +57,19 @@
   --hljs-meta: #82aaff;
   --hljs-variable: #cf6a4c;
 }
-/* Reset a few things. */
 
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font: inherit;
-  vertical-align: baseline;
-
-}
-
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
 
 *, *:before, *:after {
   box-sizing: border-box;
 }
 
-html {
-  font-size: 15px;
-}
-
 body {
-  text-align: left;
-  background: #FFFFFF;
   color: var(--color);
   background-color: var(--main-background);
 }
 
 body {
-  max-width: 90ex;
-  margin-left: calc(10vw + 20ex);
-  margin-right: 4ex;
-  margin-top: 20px;
-  margin-bottom: 50px;
-  font-family: "Noticia Text", Georgia, serif;
   line-height: 1.5;
-}
-
-header {
-  margin-bottom: 30px;
-}
-
-nav {
-  font-family: "Fira Sans", Helvetica, Arial, sans-serif;
 }
 
 /* Basic markup elements */
@@ -186,8 +152,8 @@ a {
 }
 
 a:hover {
-  box-shadow: 0 1px 0 0 #2C5CBD;
-  box-shadow: 0 1px 0 0 var(--link-color);
+  text-decoration: underline;
+  color: var(--link-color-hover);
 }
 
 /* Linked highlight */
@@ -217,8 +183,6 @@ a.anchor:hover {
 a.anchor {
   visibility: hidden;
   position: absolute;
-  /* top: 0px; */
-  /* margin-left: -3ex; */
   margin-left: -1.3em;
   font-weight: normal;
   font-style: normal;
@@ -227,6 +191,10 @@ a.anchor {
   /* To remain selectable */
   color: #d5d5d5;
   color: var(--anchor-color);
+}
+
+h2, h1 > a.anchor  {
+  margin-left: -1.7em;
 }
 
 .spec > a.anchor {
@@ -247,7 +215,6 @@ a.anchor {
    we restart the sequence there like h2  */
 
 h1, h2, h3, h4, h5, h6, .h7, .h8, .h9, .h10 {
-  font-family: "Fira Sans", Helvetica, Arial, sans-serif;
   font-weight: 400;
   margin: 0.5em 0 0.5em 0;
   padding-top: 0.1em;
@@ -255,24 +222,25 @@ h1, h2, h3, h4, h5, h6, .h7, .h8, .h9, .h10 {
   overflow-wrap: break-word;
 }
 
-h1 {
+#odoc-content h1 {
   font-weight: 500;
   font-size: 2.441em;
   margin-top: 1.214em;
+  border-left: solid orange 8px;
+  border-bottom: solid orange 1px;
+  padding-left: 8px;
 }
 
-h1 {
+#odoc-content h1 {
   font-weight: 500;
   font-size: 1.953em;
-  box-shadow: 0 1px 0 0 #ddd;
-  box-shadow: 0 1px 0 0 var(--header-shadow);
 }
 
-h2 {
+#odoc-content h2 {
   font-size: 1.563em;
 }
 
-h3 {
+#odoc-content h3 {
   font-size: 1.25em;
 }
 
@@ -324,7 +292,7 @@ h4 {
 /* Preformatted and code */
 
 tt, code, pre {
-  font-family: "Fira Mono", courier;
+  font-family: "Fira Code", courier;
   font-weight: 400;
 }
 
@@ -547,33 +515,42 @@ td.def-doc *:first-child {
 
 /* Sidebar and TOC */
 
-.odoc-toc:before {
+
+.odoc-toc {
+  position: fixed;
+  left: 1rem;
+  top: 5rem;
+  overflow: visible;
+  width: 250px;
+
+  position: fixed;
+  background: #f6f8fa;
+  background: var(--toc-background);
+  color: #1F2D3D;
+  color: var(--toc-color);
+  padding-left: 2ex;
+  padding-right: 2ex;
+  width: 250px;
+  border-radius: 0.5rem;
+  box-shadow: #0002 0 0 5px 2px;
+
+  opacity: 0.8;
+}
+
+.odoc-toc:hover {
+  opacity: 1;
+}
+
+.odoc-toc::before {
   display: block;
   content: "Contents";
   text-transform: uppercase;
   font-size: 1em;
   margin: 1.414em 0 0.5em;
-  font-weight: 500;
+  font-weight: 700;
   color: #777;
   color: var(--toc-before-color);
   line-height: 1.2;
-}
-
-.odoc-toc {
-  position: fixed;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  max-width: 30ex;
-  min-width: 26ex;
-  width: 20%;
-  background: #f6f8fa;
-  background: var(--toc-background);
-  overflow: auto;
-  color: #1F2D3D;
-  color: var(--toc-color);
-  padding-left: 2ex;
-  padding-right: 2ex;
 }
 
 .odoc-toc ul li a {
@@ -621,19 +598,17 @@ td.def-doc *:first-child {
 
 /* Mobile adjustements. */
 
-@media only screen and (max-width: 95ex) {
-  .odoc-content {
-    margin: auto;
-    padding: 2em;
-  }
+@media only screen and (max-width: 1300px) {
   .odoc-toc {
-    position: static;
+    position: initial;
     width: auto;
     min-width: unset;
     max-width: unset;
     border: none;
     padding: 0.2em 1em;
     border-radius: 5px;
+    background-color: #0001;
+    border-radius: 0.5rem;
   }
 }
 

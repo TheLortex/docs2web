@@ -11,6 +11,7 @@ depends: [
   "tyxml-jsx"
   "lambdasoup"
   "reason"
+  "omd"
 ]
 build: [
 #  ["dune" "subst"] {pinned}

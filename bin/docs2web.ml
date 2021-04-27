@@ -77,7 +77,8 @@ let packages_scope ~state kind =
 
 let job =
   let* state = Docs2web.State.v () in
-  Dream.serve ~prefix:Docs2web.Config.prefix @@ Dream.logger
+  Dream.log "Ready to serve at http://localhost:%d%s" 8082 Docs2web.Config.prefix;
+  Dream.serve ~port:8082 ~prefix:Docs2web.Config.prefix @@ Dream.logger
   @@ Dream.router
        [
          Dream.get "/" (fun _ -> respond Docs2web_pages.Index.v);

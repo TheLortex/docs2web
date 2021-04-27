@@ -1,4 +1,4 @@
-open Tyxml;
+
 open Docs2web;
 
 let badge = (state, package) => {
@@ -7,11 +7,11 @@ let badge = (state, package) => {
   switch (pkg) {
   | Some(pkg) =>
     switch (Documentation.Package.status(pkg)) {
-    | Built(_) => <span> "✅" </span>
-    | Pending => <span> "🟠" </span>
-    | Failed => <span> "❌" </span>
-    | Unknown => <span />
+    | Built(_) => "📕"
+    | Pending => "🟠"
+    | Failed => "❌"
+    | Unknown => ""
     }
-  | None => <span />
+  | None => ""
   };
 };

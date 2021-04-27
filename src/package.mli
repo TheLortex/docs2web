@@ -1,11 +1,16 @@
 module Info : sig
   type t = {
-    dependencies : OpamPackage.t list;
     synopsis : string;
     description : string;
     authors : string list;
-    maintainers : string list;
     license : string;
+    publication_date : string;
+    homepage : string list;
+    tags : string list;
+    maintainers : string list;
+    dependencies : (OpamPackage.Name.t * string option) list;
+    depopts : (OpamPackage.Name.t * string option) list;
+    conflicts : (OpamPackage.Name.t * string option) list;
   }
 
   val of_opamfile : OpamFile.OPAM.t -> t

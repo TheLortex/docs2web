@@ -1,321 +1,128 @@
-@import url('https://fonts.googleapis.com/css?family=Fira+Mono:400,500');
-@import url('https://fonts.googleapis.com/css?family=Noticia+Text:400,400i,700');
-@import url('https://fonts.googleapis.com/css?family=Fira+Sans:400,400i,500,500i,600,600i,700,700i');
+@charset "UTF-8";
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+Pro&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;700&display=swap');
+
+/* TAILWIND PREFLIGHT */
+@import 'preflight.css';
+
+/* Highlightjs */
+@import 'styles/default.css';
+
+/* Odoc */
+@import 'odoc.css';
+
+/* MAIN TEMPLATE */
 body {
-    background-color: white;
-    margin: 0;
-    font-family: "Noticia Text", Georgia, serif;
+    font-family: 'Fira Sans', sans-serif;
+    background-color: #eee;
+    padding-bottom: 1rem;
 }
 
-a {
-    color: #b40404;
+h1 {
+    font-size: 3rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    border-left: solid orange 8px;
+    border-bottom: solid orange 1px;
+    padding-left: 8px;
+    margin-bottom: 0.5rem;
+}
+
+h3 {
+    border-left: solid orange 4px;
+    padding-left: 4px;
+    font-size: 1.2rem;
+    font-weight: lighter;
+}
+
+/* HEADER */
+
+#header {
+    background-color: rgb(250, 250, 250);
+}
+
+#header nav {
+    max-width: 800px;
+    margin: auto;
+}
+
+nav a {
     text-decoration: none;
+    color: rgba(107,114,128);
+    display: inline-block;
 }
 
-.list-packages tr:nth-child(odd) {
-    background-color: #f8f8f8;
+nav a:hover {
+    color: black;
+    text-decoration: underline;
 }
 
-.list-packages td {
-    padding: 5px;
-}
-
-.permalink {
-    opacity: 0.5;
-}
-
-.permalink:hover {
-    opacity: 1;
-}
-
-header {
-    font-variant: small-caps;
-    border-bottom: solid gray 1px;
-}
-
-header nav {
-    max-width: 140ex;
-    margin: auto;
-    border-left: solid #ccc 1px;
-}
-
-header nav li:hover {
-    background-color: #ebe7e1;
-}
-
-body>section {
-    max-width: 140ex;
-    margin: auto;
-    padding-bottom: 20px;
-}
-
-header nav ul {
-    padding: 0;
+#header nav ul {
+    display: flex;
+    padding: 0.5rem 0;
+    align-items: center;
     margin: 0;
-    list-style: none;
-    position: relative;
 }
 
-header nav ul li {
+#header nav ul li {
+    margin-right: 2rem;
+}
+
+
+#ocaml-logo {
     display: inline-block;
-    border-right: solid #ccc 1px;
-    position: relative;
+    height: 2rem;
 }
 
-header li>a,
-header li>span,
-header li>div {
-    padding: 10px 30px;
-    width: 100%;
-    height: 100%;
-    display: inline-block;
-}
 
-header nav ul ul {
-    display: none;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 1000;
-}
-
-header nav ul li:hover>div>ul {
+#header nav ul li:hover ul {
     display: inherit;
 }
 
-header nav ul ul {
-    max-height: 40vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: solid gray 1px;
-    box-shadow: 0 0 3px black;
-}
-
-header nav ul ul li {
-    width: 170px;
-    float: none;
-    display: list-item;
-    position: relative;
-    background-color: white;
-}
-
-header nav ul ul li a {
-    max-width: 100px;
-}
-
-header li>div>a:after {
-    padding-left: 10px;
-    content: '▼';
-}
-
-header li>div>a:only-child:after {
-    content: '';
-}
-
-
-/* Taken from odoc */
-
-:root,
-.light:root {
-    --link-color: #2C94BD;
-    --anchor-hover: #555;
-    --anchor-color: #d5d5d5;
-    --xref-shadow: #cc6666;
-    --header-shadow: #ddd;
-    --by-name-version-color: #aaa;
-    --by-name-nav-link-color: #222;
-    --target-background: rgba(187, 239, 253, 0.3);
-    --target-shadow: rgba(187, 239, 253, 0.8);
-    --pre-border-color: #eee;
-    --code-background: #f6f8fa;
-    --spec-summary-border-color: #5c9cf5;
-    --spec-summary-background: var(--code-background);
-    --spec-summary-hover-background: #ebeff2;
-    --spec-details-after-background: rgba(0, 4, 15, 0.05);
-    --spec-details-after-shadow: rgba(204, 204, 204, 0.53);
-}
-
-
-/* Taken from bootstrap */
-
-
-/* See also https://stackoverflow.com/a/27769435/4220738 */
-
-.comment-delim {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-
-/* Preformatted and code */
-
-tt,
-code,
-pre {
-    font-family: "Fira Mono", courier;
-    font-weight: 400;
-}
-
-pre {
-    padding: 0.1em;
-    border: 1px solid #eee;
-    border: 1px solid var(--pre-border-color);
-    border-radius: 5px;
-    overflow-x: auto;
-}
-
-p code,
-li code {
-    background-color: #f6f8fa;
-    color: #0d2b3e;
-    background-color: var(--li-code-background);
-    color: var(--li-code-color);
-    border-radius: 3px;
-    padding: 0 0.3ex;
-}
-
-p a>code {
-    color: #2C5CBD;
-    color: var(--link-color);
-}
-
-
-/* Code blocks (e.g. Examples) */
-
-pre code {
-    font-size: 0.893rem;
-}
-
-
-/* Code lexemes */
-
-.keyword {
-    font-weight: 500;
-}
-
-.arrow {
-    white-space: nowrap
-}
-
-
-/* Module member specification */
-
-.spec {
-    background-color: var(--spec-summary-background);
-    border-radius: 3px;
-    border-left: 4px solid var(--spec-summary-border-color);
-    border-right: 5px solid transparent;
-    padding: 0.35em 0.5em;
-}
-
-div.spec,
-.def-doc {
-    margin-bottom: 20px;
-}
-
-.spec.type .variant {
-    margin-left: 2ch;
-}
-
-.spec.type .variant p {
-    margin: 0;
-    font-style: italic;
-}
-
-.spec.type .record {
-    margin-left: 2ch;
-}
-
-.spec.type .record p {
-    margin: 0;
-    font-style: italic;
-}
-
-div.def {
-    margin-top: 0;
-    text-indent: -2ex;
-    padding-left: 2ex;
-}
-
-div.def+div.def-doc {
-    margin-left: 1ex;
-    margin-top: 2.5px
-}
-
-div.def-doc>*:first-child {
-    margin-top: 0;
-}
-
-
-/* Collapsible inlined include and module */
-
-.odoc-include details {
-    position: relative;
-}
-
-.odoc-include details:after {
-    z-index: -100;
-    display: block;
-    content: " ";
-    position: absolute;
-    border-radius: 0 1ex 1ex 0;
-    right: -20px;
-    top: 1px;
-    bottom: 1px;
-    width: 15px;
-    background: rgba(0, 4, 15, 0.05);
-    box-shadow: 0 0px 0 1px rgba(204, 204, 204, 0.53);
-    background: var(--spec-details-after-background);
-    box-shadow: 0 0px 0 1px var(--spec-details-after-shadow);
-}
-
-.odoc-include summary {
-    position: relative;
-    margin-bottom: 20px;
-    cursor: pointer;
-    outline: none;
-}
-
-.odoc-include summary:hover {
-    background-color: var(--spec-summary-hover-background);
-}
-
-
-/* FIXME: Does not work in Firefox. */
-
-.odoc-include summary::-webkit-details-marker {
-    color: #888;
-    transform: scaleX(-1);
-    position: absolute;
-    top: calc(50% - 5px);
-    height: 11px;
-    right: -29px;
-}
-
-
-/* Records and variants FIXME */
-
-div.def table {
-    text-indent: 0em;
-    padding: 0;
-    margin-left: -2ex;
-}
-
-td.def {
-    padding-left: 2ex;
-}
-
-td.def-doc *:first-child {
-    margin-top: 0em;
-}
-
-.odoc-toc {
+#header nav ul li ul {
     display: none;
+    position: absolute;
+    background-color: white;
+
+}
+
+#odoc-content {
+    padding-bottom: 1rem;
+    position: relative;
+}
+
+/* MAIN CONTENT */
+section {
+    max-width: 800px;
+    margin: auto;
+    background-color: white;
+    padding: 0 2rem;
+    border-radius: 0 0 1rem 1rem;
+}
+
+p {
+    font-family: 'Source Serif Pro', serif;
+}
+
+.caption {
+    display: none
+}
+
+div:hover > .caption {
+    position: absolute;
+    display: block;
+    background-color: white;
+    color: black;
+    padding: 0.25rem 0.5rem;
+    box-shadow: #0008 0 0 3px 1px;
+    transform: translateX(-50%);
+    border-radius: 0.25rem;
+}
+
+
+.list-packages tr:nth-child(odd) {
+    background-color: #eeeeee;
 }

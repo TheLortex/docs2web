@@ -11,15 +11,54 @@ let item = (state, (name, (version, info))) => {
     <td> <a href=uri> {name |> Html.txt} </a> </td>
     <td style="display: flex; justify-content: space-between;">
       <div> {version |> Html.txt} </div>
-      <div> {Docs.badge(state, package)} </div>
+      <div> {Docs.badge(state, package) |> Html.txt} </div>
     </td>
     <td> {info.Docs2web.Package.Info.synopsis |> Html.txt} </td>
   </tr>;
 };
 
+module CharMap = Map.Make(Char);
+
+let make_map = (packages) => {
+  let res = ref(CharMap.empty);
+
+  List.iter(((name, _) as entry) => {
+    let v = OpamPackage.Name.to_string(name).[0]  |> Char.uppercase_ascii;
+    res := CharMap.update(v, (st) => switch (st) {
+      | None => Some([entry])
+      | Some(values) => Some([entry, ...values])
+    }, res^)
+  }, packages);
+
+  res^
+}
+
+let compile = ((chr, items)) => {
+  let c = Char.escaped(chr);
+  [<tr><td colspan="3"><h2 id={"index-"++c}>{c |> Html.txt}</h2></td></tr>, ...items]
+}
+
 let render = (state, packages) => {
-  let content = List.map(item(state), packages);
+
+  let by_char = make_map(packages);
+
+  let content = CharMap.map(List.map(item(state)), by_char) 
+    |> CharMap.bindings 
+    |> List.map(compile) 
+    |> List.flatten;
+
+  let chars = CharMap.bindings(by_char) 
+    |> List.map(fst) 
+    |> List.map ((c) => {
+      let c = Char.escaped(c);
+      <a href={"#index-"++c} style="margin-right: 1rem; font-size: 2rem;">{c |> Html.txt}</a>
+    });
+
   <Template title=" - Packages">
+    <h1 style="margin: 0; padding: 1rem">"Package index"</h1>
+    <div style="background-color: rgba(253, 235, 187, 0.5); margin: 0 -2rem; padding: 0 2rem;">
+    ...chars
+    </div>
     <br />
     <table class_="list-packages">
       <thead>

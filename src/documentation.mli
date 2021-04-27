@@ -24,4 +24,4 @@ val package_info : t -> OpamPackage.t -> Package.t option
 
 val universe_info : t -> string -> Universe.t option
 
-val load : string -> ([> Html_types.div ] Tyxml.Html.elt, error) result Lwt.t
+val load : t -> string -> ([> Html_types.div ] Tyxml.Html.elt, [> error]) result Lwt.t
