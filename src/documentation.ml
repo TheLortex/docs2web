@@ -17,7 +17,7 @@ end
 module StringMap = OpamStd.String.Map
 
 type t = {
-  packages : Package.t OpamPackage.Map.t;
+  mutable packages : Package.t OpamPackage.Map.t;
   universes : Universe.t StringMap.t;
   static_files_endpoint : string;
 }
@@ -28,9 +28,7 @@ open Lwt.Syntax
 
 let packages_query = Docs_api.Packages.make ()
 
-let () = Printf.printf "q: '%s'\n" packages_query#query
-
-let packages () =
+let get_packages () =
   let body =
     `Assoc [ ("query", `String packages_query#query); ("variables", `Null) ]
   in
@@ -43,7 +41,6 @@ let packages () =
       Config.api
   in
   let* body = Cohttp_lwt.Body.to_string body in
-  Printf.printf "Body ==> \n....\n%s\n" body;
   match Cohttp.Code.(code_of_status response.status |> is_success) with
   | false ->
       Lwt.fail
@@ -72,13 +69,23 @@ let parse data =
   |> OpamPackage.Map.of_seq
 
 let parse () =
-  let+ data = packages () in
+  let+ data = get_packages () in
   let packages = parse data in
-  {
+  let res = {
     packages;
     universes = StringMap.empty;
     static_files_endpoint = data#static_files_endpoint;
-  }
+  } in 
+  let rec updater () = 
+    let* () = Lwt_unix.sleep 180. in
+    Dream.log "Docs: updating docs status.";
+    let* data = get_packages () in
+    let packages = parse data in
+    res.packages <- packages;
+    updater ()
+  in
+  Lwt.async updater;
+  res
 
 let package_info t pkg = OpamPackage.Map.find_opt pkg t.packages
 
