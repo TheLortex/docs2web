@@ -7,7 +7,7 @@ let badge = (state, package) => {
   switch (pkg) {
   | Some(pkg) =>
     switch (Documentation.Package.status(pkg)) {
-    | Built(_) => "📕"
+    | Built(_) => "📗"
     | Pending => "🟠"
     | Failed => "❌"
     | Unknown => ""

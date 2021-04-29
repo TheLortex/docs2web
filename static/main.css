@@ -25,14 +25,14 @@ h1 {
 
 h2 {
     font-size: 1.5rem;
-    border-left: solid orange 8px;
-    border-bottom: solid orange 1px;
+    border-left: solid #ffa500b5 8px;
+    border-bottom: solid #ffa500b5 1px;
     padding-left: 8px;
     margin-bottom: 0.5rem;
 }
 
 h3 {
-    border-left: solid orange 4px;
+    border-left: solid #ffa500b5 4px;
     padding-left: 4px;
     font-size: 1.2rem;
     font-weight: lighter;
@@ -95,15 +95,15 @@ nav a:hover {
 }
 
 /* MAIN CONTENT */
-section {
+#main-section {
     max-width: 800px;
     margin: auto;
     background-color: white;
-    padding: 0 2rem;
+    padding: 1rem 2rem;
     border-radius: 0 0 1rem 1rem;
 }
 
-p {
+#odoc-content p {
     font-family: 'Source Serif Pro', serif;
 }
 

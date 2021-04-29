@@ -55,7 +55,7 @@ let render = (state, packages) => {
     });
 
   <Template title=" - Packages">
-    <h1 style="margin: 0; padding: 1rem">"Package index"</h1>
+    <h1 style="margin: 0; padding-bottom: 1rem">"Package index"</h1>
     <div style="background-color: rgba(253, 235, 187, 0.5); margin: 0 -2rem; padding: 0 2rem;">
     ...chars
     </div>

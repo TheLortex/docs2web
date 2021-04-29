@@ -81,7 +81,7 @@ let job =
   Dream.serve ~port:8082 ~prefix:Docs2web.Config.prefix @@ Dream.logger
   @@ Dream.router
        [
-         Dream.get "/" (fun _ -> respond Docs2web_pages.Index.v);
+         Dream.get "/" (fun _ -> respond (Docs2web_pages.Index.v ~state));
          Dream.scope "/packages" [] (packages_scope ~state Packages);
          Dream.scope "/universes" []
            [

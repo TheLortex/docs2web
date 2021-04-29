@@ -26,7 +26,7 @@ let createElement = (~header=[], ~title, ~children, ()) => {
           </ul> 
         </nav>
       </header>
-      <section> ...children </section>
+      <section id="main-section"> ...children </section>
     </body>
   </html>;
 };

@@ -20,8 +20,30 @@ type error = [ `Not_found ]
 
 val parse : unit -> t Lwt.t
 
+module Stats : sig 
+
+  type status_count = {
+    total: int;
+    failed: int;
+    pending: int;
+    success: int;
+  }
+  
+  type t = {
+    opam: status_count;
+    versions: status_count;
+    universes: status_count;
+  }
+
+  val to_string : status_count -> string
+end
+
+
+val stats : t -> Stats.t
+
 val package_info : t -> OpamPackage.t -> Package.t option
 
 val universe_info : t -> string -> Universe.t option
 
 val load : t -> string -> ([> Html_types.div ] Tyxml.Html.elt, [> error]) result Lwt.t
+
