@@ -123,6 +123,6 @@ div:hover > .caption {
 }
 
 
-.list-packages tr:nth-child(odd) {
+.list-packages .pkg-item:nth-child(odd) {
     background-color: #eeeeee;
 }

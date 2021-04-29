@@ -7,7 +7,7 @@ let item = (state, (name, (version, info))) => {
   let name = OpamPackage.Name.to_string(name);
   let version = OpamPackage.Version.to_string(version);
   let uri = name ++ "/" ++ version;
-  <tr>
+  <tr className="pkg-item">
     <td> <a href=uri> {name |> Html.txt} </a> </td>
     <td style="display: flex; justify-content: space-between;">
       <div> {version |> Html.txt} </div>
@@ -51,12 +51,12 @@ let render = (state, packages) => {
     |> List.map(fst) 
     |> List.map ((c) => {
       let c = Char.escaped(c);
-      <a href={"#index-"++c} style="margin-right: 1rem; font-size: 2rem;">{c |> Html.txt}</a>
+      <a href={"#index-"++c} style="margin-right: 0.75rem; font-size: 1.75rem;">{c |> Html.txt}</a>
     });
 
   <Template title=" - Packages">
     <h1 style="margin: 0; padding-bottom: 1rem">"Package index"</h1>
-    <div style="background-color: rgba(253, 235, 187, 0.5); margin: 0 -2rem; padding: 0 2rem;">
+    <div style="background-color: rgba(253, 244, 226, 0.5); margin: 0 -2rem; padding: 0 2rem;">
     ...chars
     </div>
     <br />
