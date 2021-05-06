@@ -143,7 +143,7 @@ let parse data =
   in
   (data, !stats)
 
-let parse ~api () =
+let make ~api ~polling () =
   let res =
     {
       packages = OpamPackage.Map.empty;
@@ -176,12 +176,11 @@ let parse ~api () =
                 (Printexc.to_string exn));
           Lwt.return ())
     in
-    (* We poll every 30 seconds, and when last_update changes we perform the full request. *)
-    let* () = Lwt_unix.sleep 30. in
+    let* () = Lwt_unix.sleep (float_of_int polling) in
     updater ()
   in
   Lwt.async updater;
-  Lwt.return res
+  res
 
 let stats t = t.stats
 

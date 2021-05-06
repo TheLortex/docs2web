@@ -14,13 +14,12 @@ let redirect ~target =
   Dream.response ~status:`Moved_Permanently ~headers:[ ("Location", target) ] ""
 
 let not_found ~prefix _ =
-  Dream.respond ~status:`Not_Found (Docs2web_pages.Notfound.v prefix ()) 
+  Dream.respond ~status:`Not_Found (Docs2web_pages.Notfound.v prefix ())
 
 let packages_scope ~state kind =
   let open Docs2web_pages in
   let prefix = Docs2web.State.prefix state in
-  let not_found = not_found ~prefix
-  in
+  let not_found = not_found ~prefix in
   let get_kind request =
     match kind with
     | Packages -> Package.Blessed
@@ -76,10 +75,9 @@ let cache_header handler request =
   let+ response = handler request in
   Dream.with_header "Cache-Control" "public, max-age=3600, immutable" response
 
-let job ~interface ~port ~api ~prefix =
-  let* state = Docs2web.State.v ~api ~prefix () in
-  Dream.log "Ready to serve at http://localhost:%d%s" port
-    prefix;
+let job ~interface ~port ~api ~prefix ~polling =
+  let state = Docs2web.State.v ~api ~prefix ~polling () in
+  Dream.log "Ready to serve at http://localhost:%d%s" port prefix;
   Dream.serve ~interface ~port ~prefix
   @@ Dream.logger
   @@ Dream.router
@@ -94,11 +92,11 @@ let job ~interface ~port ~api ~prefix =
          Dream.scope "/static" [ cache_header ]
            [ Dream.get "/**" @@ Dream.static "static" ];
        ]
-  @@ (not_found ~prefix)
+  @@ not_found ~prefix
 
-let main interface port api prefix = 
+let main interface port api prefix polling =
   let api = Uri.of_string api in
-  Lwt_main.run (job ~interface ~port ~api ~prefix)
+  Lwt_main.run (job ~interface ~port ~api ~prefix ~polling)
 
 (* Command-line parsing *)
 
@@ -114,18 +112,23 @@ let port =
   @@ Arg.info ~doc:"The port on which to listen for HTTP connections."
        ~docv:"PORT" [ "port" ]
 
+let polling =
+  Arg.value @@ Arg.opt Arg.int 30
+  @@ Arg.info ~doc:"Polling speed in seconds."
+       ~docv:"SECS" [ "polling" ]
+
 let api =
   Arg.value
   @@ Arg.opt Arg.string "http://localhost:8081/graphql"
   @@ Arg.info ~doc:"API endpoint" ~docv:"URL" [ "api" ]
 
 let prefix =
-  Arg.value
-  @@ Arg.opt Arg.string "/"
+  Arg.value @@ Arg.opt Arg.string "/"
   @@ Arg.info ~doc:"Server prefix" [ "prefix" ]
 
 let cmd =
   let doc = "Docs2web: a frontend for the docs ci" in
-  (Term.(const main $ interface $ port $ api $ prefix), Term.info "docs2web" ~doc)
+  ( Term.(const main $ interface $ port $ api $ prefix $ polling),
+    Term.info "docs2web" ~doc )
 
 let () = Term.(exit @@ eval cmd)

@@ -1,6 +1,6 @@
 type t
 
-val v : prefix:string -> api:Uri.t -> unit -> t Lwt.t
+val v : prefix:string -> api:Uri.t -> polling:int -> unit -> t
 
 val all_packages_latest :
   t -> (OpamPackage.Version.t * Package.Info.t) OpamPackage.Name.Map.t Lwt.t
