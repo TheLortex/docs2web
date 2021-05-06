@@ -24,16 +24,12 @@ module Stats = struct
     success : int;
   }
 
-  let to_string {total; failed; pending; success} = 
-    let pending = match pending with 
-      | 0 -> ""
-      | n -> Fmt.str "/ %d 🟠" pending
+  let to_string { total; failed; pending; success } =
+    let pending =
+      match pending with 0 -> "" | n -> Fmt.str "/ %d 🟠" pending
     in
-    let failed = match failed with 
-      | 0 -> ""
-      | n -> Fmt.str "/ %d ❌" failed
-    in
-      Fmt.str "%d ↦ %d 📗 %s %s" total success pending failed
+    let failed = match failed with 0 -> "" | n -> Fmt.str "/ %d ❌" failed in
+    Fmt.str "%d ↦ %d 📗 %s %s" total success pending failed
 
   type t = {
     opam : status_count;
@@ -51,8 +47,7 @@ module Stats = struct
 
   type kind = Opam | Version | Universe
 
-  let update_status sc =
-    function
+  let update_status sc = function
     | `FAILED -> { sc with total = sc.total + 1; failed = sc.failed + 1 }
     | `PENDING -> { sc with total = sc.total + 1; pending = sc.pending + 1 }
     | `SUCCESS -> { sc with total = sc.total + 1; success = sc.success + 1 }
@@ -68,7 +63,7 @@ end
 type t = {
   mutable packages : Package.t OpamPackage.Map.t;
   universes : Universe.t StringMap.t;
-  static_files_endpoint : string;
+  mutable static_files_endpoint : string;
   mutable stats : Stats.t;
 }
 
@@ -76,12 +71,8 @@ type error = [ `Not_found ]
 
 open Lwt.Syntax
 
-let packages_query = Docs_api.Packages.make ()
-
-let get_packages ~api () =
-  let body =
-    `Assoc [ ("query", `String packages_query#query); ("variables", `Null) ]
-  in
+let get_cohttp ~query ~api () =
+  let body = `Assoc [ ("query", `String query#query); ("variables", `Null) ] in
   let serialized_body = Yojson.Basic.to_string body in
   let headers =
     Cohttp.Header.of_list [ ("Content-Type", "application/json") ]
@@ -96,7 +87,17 @@ let get_packages ~api () =
         (Failure ("Status: " ^ Cohttp.Code.string_of_status response.status))
   | true ->
       let json = Yojson.Basic.(from_string body |> Util.member "data") in
-      Lwt.return (packages_query#parse json)
+      Lwt.return (query#parse json)
+
+let last_update_query = Docs_api.Last_update.make ()
+
+let get_last_update ~api () =
+  let+ res = get_cohttp ~query:last_update_query ~api () in
+  res#last_update
+
+let packages_query = Docs_api.Packages.make ()
+
+let get_packages = get_cohttp ~query:packages_query
 
 let parse_status t =
   match t#status with
@@ -135,33 +136,52 @@ let parse_package ~stats package =
 
 let parse data =
   let stats = ref Stats.empty in
-  let data = data#packages |> Array.to_seq
+  let data =
+    data#packages |> Array.to_seq
     |> Seq.flat_map (parse_package ~stats)
-    |> OpamPackage.Map.of_seq in
-  data, !stats
+    |> OpamPackage.Map.of_seq
+  in
+  (data, !stats)
 
 let parse ~api () =
-  let+ data = get_packages ~api () in
-  let packages, stats = parse data in
   let res =
     {
-      packages;
+      packages = OpamPackage.Map.empty;
       universes = StringMap.empty;
-      static_files_endpoint = data#static_files_endpoint;
-      stats;
+      static_files_endpoint = "";
+      stats = Stats.empty;
     }
   in
-  let rec updater () =
-    let* () = Lwt_unix.sleep 180. in
+  let update_docs_status () =
     Dream.log "Docs: updating docs status.";
-    let* data = get_packages ~api () in
+    let+ data = get_packages ~api () in
     let packages, stats = parse data in
     res.packages <- packages;
     res.stats <- stats;
+    res.static_files_endpoint <- data#static_files_endpoint
+  in
+  let last_update = ref "" in
+  let rec updater () =
+    let* () =
+      Lwt.catch
+        (fun () ->
+          let* v = get_last_update ~api () in
+          if v <> !last_update then
+            let+ () = update_docs_status () in
+            last_update := v
+          else Lwt.return_unit)
+        (fun exn ->
+          Dream.error (fun log ->
+              log "Failed to contact the graphql api: %s"
+                (Printexc.to_string exn));
+          Lwt.return ())
+    in
+    (* We poll every 30 seconds, and when last_update changes we perform the full request. *)
+    let* () = Lwt_unix.sleep 30. in
     updater ()
   in
   Lwt.async updater;
-  res
+  Lwt.return res
 
 let stats t = t.stats
 

@@ -16,3 +16,10 @@ module Packages = [%graphql {|
 }
 |}
 ]
+
+module Last_update = [%graphql {| 
+{
+ last_update
+}
+|}
+]
