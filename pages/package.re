@@ -6,9 +6,9 @@ type kind =
   | Blessed
   | Universe(string);
   
-let version_link = (name, version) => {
+let version_link = (prefix, name, version) => {
   let version = OpamPackage.Version.to_string(version);
-  let link = Docs2web.Config.prefix ++ "packages/" ++ name ++ "/" ++ version;
+  let link = prefix ++ "packages/" ++ name ++ "/" ++ version;
   <span> <a href=link> {version |> Html.txt} </a> "/" </span>;
 };
 
@@ -99,13 +99,15 @@ module Header = {
 
   let createElement = (~name, ~version, ~all_versions, ~path, ~state, ~docs_status, ~mode, ()) => {
 
+  let prefix = State.prefix(state);
+
   let all_package_versions_select =
     OpamPackage.Version.Map.keys(all_versions)
     |> List.rev_map(version' => {
          let package = OpamPackage.create(name, version');
          let version_str = OpamPackage.Version.to_string(version');
          let package_name = OpamPackage.Name.to_string(name);
-         let target={Config.prefix ++ "packages/" ++ package_name ++ "/" ++ version_str};
+         let target={prefix ++ "packages/" ++ package_name ++ "/" ++ version_str};
 
          let value = (version_str ++ " " ++ Docs.badge(state, package)) |> Html.txt;
 
@@ -123,7 +125,7 @@ module Header = {
     let name = OpamPackage.Name.to_string(name);
     let version = OpamPackage.Version.to_string(version);
 
-    let info_url = Config.prefix ++ "packages/" ++ name ++ "/" ++ version;
+    let info_url = prefix ++ "packages/" ++ name ++ "/" ++ version;
     let docs_url = info_url ++ "/docs";
 
     let docs_status_message = switch(docs_status) {
@@ -190,10 +192,11 @@ let render = (~state, ~name, ~version, ~info: Docs2web.Package.Info.t, ~docs, ~d
 
   let title = " - " ++ OpamPackage.Name.to_string(name) ++ "." ++ OpamPackage.Version.to_string(version);
 
+  let prefix = State.prefix(state);
 
   if (path == "") {
     /* Root: we display opam package informations */
-    <Template title>
+    <Template prefix title>
     <Header 
       name={name} 
       version={version} 
@@ -256,7 +259,7 @@ let render = (~state, ~name, ~version, ~info: Docs2web.Package.Info.t, ~docs, ~d
         | `Msg(e) => e
       };
 
-      <Template title>
+      <Template prefix title>
       <Header 
         name={name} 
         version={version} 
@@ -267,7 +270,7 @@ let render = (~state, ~name, ~version, ~info: Docs2web.Package.Info.t, ~docs, ~d
         mode={Docs} />
         <br /> <div> {message |> Html.txt} </div> </Template>
       }
-    | Ok(docs) => <Template title> 
+    | Ok(docs) => <Template prefix title> 
       <Header 
         name={name} 
         version={version} 
@@ -279,7 +282,7 @@ let render = (~state, ~name, ~version, ~info: Docs2web.Package.Info.t, ~docs, ~d
         <div id="odoc-content">
           docs
         </div> 
-        <script src={Config.prefix ++ "static/highlight.pack.js"} />
+        <script src={prefix ++ "static/highlight.pack.js"} />
         <script>"hljs.highlightAll();"</script>
         </Template>
     }

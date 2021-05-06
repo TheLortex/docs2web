@@ -3,12 +3,13 @@ open Lwt.Syntax
 type t = {
   packages : Package.Info.t OpamPackage.Version.Map.t OpamPackage.Name.Map.t;
   docs : Documentation.t;
+  prefix : string;
 }
 
 module Store = Git_unix.Store
 module Search = Git.Search.Make (Digestif.SHA1) (Store)
 
-let v () =
+let v ~prefix ~api () =
   Dream.log "Initializing state";
   let* () = Opam_repository.clone () in
   let* store = Opam_repository.open_store () in
@@ -22,9 +23,9 @@ let v () =
       packages
   in
   Dream.log "Loaded %d packages" (OpamPackage.Name.Map.cardinal packages);
-  let* docs = Documentation.parse () in
+  let* docs = Documentation.parse ~api () in
   Dream.log "Loaded docs status";
-  Lwt.return { packages; docs }
+  Lwt.return { packages; docs; prefix }
 
 let all_packages_latest t =
   t.packages
@@ -38,3 +39,5 @@ let get_package_opt t name =
   t.packages |> OpamPackage.Name.Map.find_opt name |> Lwt.return
 
 let docs t = t.docs
+
+let prefix t = t.prefix

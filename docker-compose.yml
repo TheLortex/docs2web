@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  docs2web:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    command:
+      - --api=http://172.17.0.1:8081/graphql
+      - --port=8082
+      - --prefix=/
+      - --interface=0.0.0.0
+    init: true
+    ports:
+      - '8082:8082' # Docs2web UI
+    volumes:
+      - 'docs2web-data:/var/lib/docs2web/var'
+volumes:
+    docs2web-data:

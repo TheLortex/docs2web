@@ -54,7 +54,9 @@ let render = (state, packages) => {
       <a href={"#index-"++c} style="margin-right: 0.75rem; font-size: 1.75rem;">{c |> Html.txt}</a>
     });
 
-  <Template title=" - Packages">
+  let prefix = State.prefix(state);
+
+  <Template prefix title=" - Packages">
     <h1 style="margin: 0; padding-bottom: 1rem">"Package index"</h1>
     <div style="background-color: rgba(253, 244, 226, 0.5); margin: 0 -2rem; padding: 0 2rem;">
     ...chars

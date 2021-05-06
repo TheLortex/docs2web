@@ -4,10 +4,11 @@ let render = (~state, ()) => {
 
   let docs = Docs2web.State.docs (state);
   let stats = Docs2web.Documentation.stats(docs);
+  let prefix = Docs2web.State.prefix (state);
 
   let item = (st) => <div style="text-align: right">{Docs2web.Documentation.Stats.to_string(st) |> Html.txt}</div>;
 
-  <Template title=""> 
+  <Template prefix title=""> 
     <h1 style="margin: 0; padding-bottom: 1rem">"Welcome to OCaml docs"</h1>
     <div style="display: flex; margin-bottom: 1rem;">
       <div style="flex: 1; padding-right: 1rem; border-right: solid #0002 1px; ">

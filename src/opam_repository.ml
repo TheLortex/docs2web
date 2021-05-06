@@ -1,20 +1,18 @@
 open Lwt.Infix
 module Store = Git_unix.Store
 
-let clone_path = "opam-repository"
+let clone_path = Fpath.(v "var" / "opam-repository")
 
 let open_store () =
-  let path = Fpath.v clone_path in
-  Git_unix.Store.v ~dotgit:path path >|= function
+  Git_unix.Store.v ~dotgit:clone_path clone_path >|= function
   | Ok x -> x
   | Error e ->
       Fmt.failwith "Failed to open opam-repository: %a" Store.pp_error e
 
 let clone () =
-  match Unix.lstat clone_path with
-  | Unix.{ st_kind = S_DIR; _ } -> Lwt.return_unit
-  | _ -> Fmt.failwith "%S is not a directory!" clone_path
-  | exception Unix.Unix_error (Unix.ENOENT, _, "opam-repository") ->
+  match Bos.OS.Path.exists clone_path with
+  | Ok true -> Lwt.return_unit
+  | Ok false ->
       Process.exec
         ( "",
           [|
@@ -22,8 +20,10 @@ let clone () =
             "clone";
             "--bare";
             "https://github.com/ocaml/opam-repository.git";
-            clone_path;
+            Fpath.to_string clone_path;
           |] )
+  | _ -> Fmt.failwith "Error finding about this path: %a" Fpath.pp clone_path
 
 let fetch () =
-  Process.exec ("", [| "git"; "-C"; clone_path; "fetch"; "origin" |])
+  Process.exec
+    ("", [| "git"; "-C"; Fpath.to_string clone_path; "fetch"; "origin" |])

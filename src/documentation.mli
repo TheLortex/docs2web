@@ -18,7 +18,7 @@ type t
 
 type error = [ `Not_found ]
 
-val parse : unit -> t Lwt.t
+val parse : api:Uri.t -> unit -> t Lwt.t
 
 module Stats : sig 
 

@@ -1,0 +1,9 @@
+**/_build
+**/_opam
+**/*.swp
+**/.git
+**/*.orig
+**/*.merlin
+var/**
+docker-compose.yml
+Dockerfile

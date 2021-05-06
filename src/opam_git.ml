@@ -47,7 +47,6 @@ let read_packages store commit =
       | None -> Fmt.failwith "'packages' is not a directory!"
       | Some tree ->
           Store.Value.Tree.to_list tree
-          |> List.filteri (fun i _ -> i > 0 && i < 1000)
           |> Lwt_list.fold_left_s
                (fun acc (entry : Store.Value.Tree.entry) ->
                  match OpamPackage.Name.of_string entry.name with

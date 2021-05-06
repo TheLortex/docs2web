@@ -13,11 +13,14 @@ let find_default_version state name =
 let redirect ~target =
   Dream.response ~status:`Moved_Permanently ~headers:[ ("Location", target) ] ""
 
-let not_found _ =
-  Dream.respond ~status:`Not_Found (Docs2web_pages.Notfound.v ())
+let not_found ~prefix _ =
+  Dream.respond ~status:`Not_Found (Docs2web_pages.Notfound.v prefix ()) 
 
 let packages_scope ~state kind =
   let open Docs2web_pages in
+  let prefix = Docs2web.State.prefix state in
+  let not_found = not_found ~prefix
+  in
   let get_kind request =
     match kind with
     | Packages -> Package.Blessed
@@ -68,17 +71,16 @@ let packages_scope ~state kind =
         | _ -> Dream.respond ~status:`Internal_Server_Error "");
   ]
 
-
 let cache_header handler request =
   let open Lwt.Syntax in
-  let+ response = handler request in 
-  Dream.with_header "Cache-Control" "public, max-age=3600, immutable" response 
-  
-let job =
-  let* state = Docs2web.State.v () in
-  Dream.log "Ready to serve at http://localhost:%d%s" 8082
-    Docs2web.Config.prefix;
-  Dream.serve ~port:8082 ~prefix:Docs2web.Config.prefix
+  let+ response = handler request in
+  Dream.with_header "Cache-Control" "public, max-age=3600, immutable" response
+
+let job ~interface ~port ~api ~prefix =
+  let* state = Docs2web.State.v ~api ~prefix () in
+  Dream.log "Ready to serve at http://localhost:%d%s" port
+    prefix;
+  Dream.serve ~interface ~port ~prefix
   @@ Dream.logger
   @@ Dream.router
        [
@@ -89,10 +91,41 @@ let job =
              Dream.get "/" (fun _ -> Dream.respond "universes");
              Dream.scope "/:hash" [] (packages_scope ~state Universes);
            ];
-         Dream.scope "/static" [cache_header] [
-           Dream.get "/**" @@ Dream.static "static";
-          ]
+         Dream.scope "/static" [ cache_header ]
+           [ Dream.get "/**" @@ Dream.static "static" ];
        ]
-  @@ not_found
+  @@ (not_found ~prefix)
 
-let () = Lwt_main.run job
+let main interface port api prefix = 
+  let api = Uri.of_string api in
+  Lwt_main.run (job ~interface ~port ~api ~prefix)
+
+(* Command-line parsing *)
+
+open Cmdliner
+
+let interface =
+  Arg.value
+  @@ Arg.opt Arg.string "localhost"
+  @@ Arg.info ~doc:"Interface to listen on" ~docv:"IF" [ "interface" ]
+
+let port =
+  Arg.value @@ Arg.opt Arg.int 8082
+  @@ Arg.info ~doc:"The port on which to listen for HTTP connections."
+       ~docv:"PORT" [ "port" ]
+
+let api =
+  Arg.value
+  @@ Arg.opt Arg.string "http://localhost:8081/graphql"
+  @@ Arg.info ~doc:"API endpoint" ~docv:"URL" [ "api" ]
+
+let prefix =
+  Arg.value
+  @@ Arg.opt Arg.string "/"
+  @@ Arg.info ~doc:"Server prefix" [ "prefix" ]
+
+let cmd =
+  let doc = "Docs2web: a frontend for the docs ci" in
+  (Term.(const main $ interface $ port $ api $ prefix), Term.info "docs2web" ~doc)
+
+let () = Term.(exit @@ eval cmd)

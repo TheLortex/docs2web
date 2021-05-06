@@ -78,7 +78,7 @@ open Lwt.Syntax
 
 let packages_query = Docs_api.Packages.make ()
 
-let get_packages () =
+let get_packages ~api () =
   let body =
     `Assoc [ ("query", `String packages_query#query); ("variables", `Null) ]
   in
@@ -87,8 +87,7 @@ let get_packages () =
     Cohttp.Header.of_list [ ("Content-Type", "application/json") ]
   in
   let* response, body =
-    Cohttp_lwt_unix.Client.post ~headers ~body:(`String serialized_body)
-      Config.api
+    Cohttp_lwt_unix.Client.post ~headers ~body:(`String serialized_body) api
   in
   let* body = Cohttp_lwt.Body.to_string body in
   match Cohttp.Code.(code_of_status response.status |> is_success) with
@@ -141,8 +140,8 @@ let parse data =
     |> OpamPackage.Map.of_seq in
   data, !stats
 
-let parse () =
-  let+ data = get_packages () in
+let parse ~api () =
+  let+ data = get_packages ~api () in
   let packages, stats = parse data in
   let res =
     {
@@ -155,7 +154,7 @@ let parse () =
   let rec updater () =
     let* () = Lwt_unix.sleep 180. in
     Dream.log "Docs: updating docs status.";
-    let* data = get_packages () in
+    let* data = get_packages ~api () in
     let packages, stats = parse data in
     res.packages <- packages;
     res.stats <- stats;
