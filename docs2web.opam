@@ -12,10 +12,10 @@ depends: [
   "lambdasoup"
   "reason"
   "omd"
+  "graphql_ppx"
 ]
 build: [
-#  ["dune" "subst"] {pinned}
-# until https://github.com/ocaml/dune/issues/1997
+  ["dune" "subst"] {pinned}
   ["dune" "build" "-p" name "-j" jobs]
 ]
 dev-repo: "git+https://github.com/ocaml/opam2web.git"

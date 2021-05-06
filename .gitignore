@@ -2,3 +2,4 @@
 _build
 docs.json
 opam-repository
+.graphql_ppx_cache
